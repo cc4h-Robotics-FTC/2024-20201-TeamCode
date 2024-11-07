@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DcMotorSimple
+import com.qualcomm.robotcore.hardware.Servo
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -17,11 +18,13 @@ class MecanumTeleOp : LinearOpMode() {
         val frontRightMotor = hardwareMap.dcMotor["frontRightMotor"]
         val backRightMotor = hardwareMap.dcMotor["backRightMotor"]
 
+        val liftMotor = hardwareMap.dcMotor["liftMotor"]
+        val dumpServo = hardwareMap.servo["dumpServo"]
+
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
         // See the note about this earlier on this page.
-        frontRightMotor.direction = DcMotorSimple.Direction.REVERSE
         backRightMotor.direction = DcMotorSimple.Direction.REVERSE
 
         waitForStart()
@@ -46,6 +49,18 @@ class MecanumTeleOp : LinearOpMode() {
             backLeftMotor.power = backLeftPower
             frontRightMotor.power = frontRightPower
             backRightMotor.power = backRightPower
+
+            liftMotor.power = gamepad2.right_stick_y.toDouble()
+
+            if (gamepad2.a) {
+                dumpServo.position = 1.0
+            }
+            if (gamepad2.b) {
+                dumpServo.position = 0.5
+            }
+
+            telemetry.addData("Position", dumpServo.position)
+            telemetry.update()
         }
     }
 }
