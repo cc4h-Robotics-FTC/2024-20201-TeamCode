@@ -21,6 +21,10 @@ class MecanumTeleOp : LinearOpMode() {
         val liftMotor = hardwareMap.dcMotor["liftMotor"]
         val dumpServo = hardwareMap.servo["dumpServo"]
 
+        val armExtendMotor = hardwareMap.dcMotor["armExtendMotor"]
+        val armLiftLeftMotor = hardwareMap.dcMotor["armLiftLeftMotor"]
+        val armLiftRightMotor = hardwareMap.dcMotor["armLiftRightMotor"]
+
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
@@ -51,6 +55,9 @@ class MecanumTeleOp : LinearOpMode() {
             backRightMotor.power = backRightPower
 
             liftMotor.power = gamepad2.right_stick_y.toDouble()
+            armExtendMotor.power = gamepad2.left_trigger.toDouble() - gamepad2.right_trigger.toDouble()
+            armLiftLeftMotor.power = gamepad2.left_stick_y.toDouble()
+            armLiftRightMotor.power = gamepad2.left_stick_y.toDouble()
 
             if (gamepad2.a) {
                 dumpServo.position = 1.0
