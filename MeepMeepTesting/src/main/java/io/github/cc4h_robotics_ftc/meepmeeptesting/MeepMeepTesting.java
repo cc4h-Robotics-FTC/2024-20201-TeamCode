@@ -29,7 +29,7 @@ public class MeepMeepTesting {
             .strafeToSplineHeading(new Vector2d(-52.0, -10.0), Math.toRadians(90.0))
             .strafeTo(new Vector2d(-61.0, -10.0))
             .strafeTo(new Vector2d(-61.0, -52.0))
-            .waitSeconds(8.0)
+            .waitSeconds(10.0)
             .strafeTo(new Vector2d(36.0, -60.0)) // Parking
             .build());
 
