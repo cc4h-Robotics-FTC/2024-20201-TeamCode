@@ -21,12 +21,14 @@ object MeepMeepTesting {
                 .splineTo(Vector2d(0.0, -34.0), Math.PI / 2)
                 .waitSeconds(1.0) // TODO: Hang Specimen
                 .splineTo(Vector2d(0.0, -54.0), Math.PI / 2)
-                .splineTo(Vector2d(-48.0, -36.0), Math.PI / 2)
+                .splineTo(Vector2d(-48.0, -40.0), Math.PI / 2)
                 .waitSeconds(1.0) // TODO: Pick Up Sample
                 .splineTo(Vector2d(-52.0, -52.0), Math.PI / 4)
                 .waitSeconds(1.0) // TODO: Dump Sample
                 .turnTo(Math.PI / 2)
-                .strafeTo(Vector2d(48.0, -62.0))
+                .strafeTo(Vector2d(18.0, -60.0))
+                .waitSeconds(14.0)
+                .strafeTo(Vector2d(36.0, -60.0))
 
 
 //                .lineToX(30.0)
