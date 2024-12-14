@@ -22,6 +22,9 @@ object MeepMeepTesting {
                 .waitSeconds(1.0) // TODO: Hang Specimen
                 .splineTo(Vector2d(0.0, -54.0), Math.PI / 2)
                 .splineTo(Vector2d(-48.0, -36.0), Math.PI / 2)
+                .waitSeconds(1.0)
+                .splineTo(Vector2d(-50.0, -50.0), Math.PI / 4)
+
 
 //                .lineToX(30.0)
 //                .turn(Math.toRadians(90.0))
