@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.Servo
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
 
 @TeleOp
 class MecanumTeleOp : LinearOpMode() {
@@ -25,11 +26,16 @@ class MecanumTeleOp : LinearOpMode() {
         val armLiftLeftMotor = hardwareMap.dcMotor["armLiftLeftMotor"]
         val armLiftRightMotor = hardwareMap.dcMotor["armLiftRightMotor"]
 
+        val wristServo = hardwareMap.crservo["wristServo"]
+        val clawServo = hardwareMap.servo["clawServo"]
+
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
         // See the note about this earlier on this page.
         backRightMotor.direction = DcMotorSimple.Direction.REVERSE
+
+        armLiftRightMotor.direction = DcMotorSimple.Direction.REVERSE
 
         waitForStart()
 
@@ -49,23 +55,45 @@ class MecanumTeleOp : LinearOpMode() {
             val frontRightPower = (y - x - rx) / denominator
             val backRightPower = (y + x - rx) / denominator
 
-            frontLeftMotor.power = frontLeftPower
-            backLeftMotor.power = backLeftPower
-            frontRightMotor.power = frontRightPower
-            backRightMotor.power = backRightPower
+            var mult = min(1.1 - gamepad1.right_trigger.toDouble(), 1.0)
+            if (gamepad1.left_bumper) mult = 0.5
+            else if (gamepad1.right_bumper) mult = 0.25
 
-            liftMotor.power = gamepad2.right_stick_y.toDouble()
+            frontLeftMotor.power = frontLeftPower * mult
+            backLeftMotor.power = backLeftPower * mult
+            frontRightMotor.power = frontRightPower * mult
+            backRightMotor.power = backRightPower * mult
+
+            liftMotor.power = gamepad2.right_stick_y.toDouble() / if (gamepad2.right_stick_y < 0) 1 else 5
             armExtendMotor.power = gamepad2.left_trigger.toDouble() - gamepad2.right_trigger.toDouble()
             armLiftLeftMotor.power = gamepad2.left_stick_y.toDouble()
             armLiftRightMotor.power = gamepad2.left_stick_y.toDouble()
 
             if (gamepad2.a) {
-                dumpServo.position = 1.0
-            }
-            if (gamepad2.b) {
-                dumpServo.position = 0.5
+                dumpServo.position += 0.005
+            } else if (gamepad2.b) {
+                dumpServo.position -= 0.005
             }
 
+            if (gamepad2.x && clawServo.position < 1.0) {
+                clawServo.position += 0.001
+            } else if (gamepad2.y && clawServo.position > 0.0) {
+                clawServo.position -= 0.001
+            }
+
+            if (gamepad2.dpad_up) {
+                wristServo.power = 1.0
+            } else if (gamepad2.dpad_down) {
+                wristServo.power = -1.0
+            } else {
+                wristServo.power = 0.0
+            }
+
+            telemetry.addData("Front Left Power", frontLeftPower)
+            telemetry.addData("Back Left Power", backLeftPower)
+            telemetry.addData("Front Right Power", frontRightPower)
+            telemetry.addData("Back Right Power", backRightPower)
+            telemetry.addData("Multiplier", mult)
             telemetry.addData("Position", dumpServo.position)
             telemetry.update()
         }
