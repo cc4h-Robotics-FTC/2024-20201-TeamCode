@@ -27,7 +27,7 @@ object MeepMeepTesting {
                 .waitSeconds(1.0) // TODO: Dump Sample
                 .turnTo(Math.PI / 2)
                 .strafeTo(Vector2d(18.0, -60.0))
-                .waitSeconds(14.0)
+                .waitSeconds(12.0)
                 .strafeTo(Vector2d(36.0, -60.0))
 
 
