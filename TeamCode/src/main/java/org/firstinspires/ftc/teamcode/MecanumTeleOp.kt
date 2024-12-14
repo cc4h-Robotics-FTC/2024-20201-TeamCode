@@ -64,7 +64,7 @@ class MecanumTeleOp : LinearOpMode() {
             frontRightMotor.power = frontRightPower * mult
             backRightMotor.power = backRightPower * mult
 
-            liftMotor.power = gamepad2.right_stick_y.toDouble() / if (gamepad2.right_stick_y < 0) 1 else 5
+            liftMotor.power = gamepad2.right_stick_y.toDouble() / if (gamepad2.right_stick_y < 0) 1 else 2
             armExtendMotor.power = gamepad2.left_trigger.toDouble() - gamepad2.right_trigger.toDouble()
             armLiftLeftMotor.power = gamepad2.left_stick_y.toDouble()
             armLiftRightMotor.power = gamepad2.left_stick_y.toDouble()
