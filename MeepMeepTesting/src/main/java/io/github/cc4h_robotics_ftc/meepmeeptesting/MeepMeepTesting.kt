@@ -19,7 +19,7 @@ object MeepMeepTesting {
         myBot.runAction(
             myBot.drive.actionBuilder(Pose2d(-25.0, -62.0, Math.PI / 2))
                 .splineTo(Vector2d(0.0, -34.0), Math.PI / 2)
-                // Hang Specimen
+                .waitSeconds(1.0) // TODO: Hang Specimen
                 .splineTo(Vector2d(0.0, -54.0), Math.PI / 2)
                 .splineTo(Vector2d(-48.0, -36.0), Math.PI / 2)
 
