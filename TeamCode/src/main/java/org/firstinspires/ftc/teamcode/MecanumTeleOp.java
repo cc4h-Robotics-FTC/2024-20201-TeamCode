@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
-import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 
 @TeleOp
@@ -25,6 +25,10 @@ public final class MecanumTeleOp extends LinearOpMode {
     private DcMotor armLiftMotor;
     private DcMotor wristMotor;
     private Servo clawServo;
+
+    public static double p = 0, i = 0, d = 0, f = 0;
+
+    private PIDFController controller = new PIDFController(p, i, d, f);
 
     public void runOpMode() throws InterruptedException {
         frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
@@ -44,16 +48,17 @@ public final class MecanumTeleOp extends LinearOpMode {
 
         armLiftMotor.setDirection(Direction.REVERSE);
 
-        liftMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor.setMode(RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-
+//        liftMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
+//        liftMotor.setMode(RunMode.RUN_WITHOUT_ENCODER);
+//        liftMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
         int[] posList = {0, -4600, -11400};
+        int target = 0;
 
         waitForStart();
 
-        liftMotor.setTargetPosition(0);
-        liftMotor.setMode(RunMode.RUN_TO_POSITION);
+//        liftMotor.setTargetPosition(0);
+//        liftMotor.setMode(RunMode.RUN_TO_POSITION);
+
         if (!this.isStopRequested()) {
             while(this.opModeIsActive()) {
                 double y = -((double)this.gamepad1.left_stick_y);
@@ -101,25 +106,34 @@ public final class MecanumTeleOp extends LinearOpMode {
                 }
 
                 if (gamepad2.dpad_left) {
-                    liftMotor.setTargetPosition(posList[1]);
-                    liftMotor.setMode(RunMode.RUN_TO_POSITION);
+//                    liftMotor.setTargetPosition(posList[1]);
+//                    liftMotor.setMode(RunMode.RUN_TO_POSITION);
+                    target = posList[1];
                 } else if (gamepad2.dpad_right) {
-                    liftMotor.setTargetPosition(posList[2]);
-                    liftMotor.setMode(RunMode.RUN_TO_POSITION);
+//                    liftMotor.setTargetPosition(posList[2]);
+//                    liftMotor.setMode(RunMode.RUN_TO_POSITION);
+                    target = posList[2];
                 } else if (gamepad2.right_bumper) {
-                    liftMotor.setTargetPosition(posList[0]);
-                    liftMotor.setMode(RunMode.RUN_TO_POSITION);
+//                    liftMotor.setTargetPosition(posList[0]);
+//                    liftMotor.setMode(RunMode.RUN_TO_POSITION);
+                    target = posList[0];
                 }
 
-                liftMotor.setTargetPosition(liftMotor.getTargetPosition() + (int)((double)gamepad2.right_stick_y / 0.1));
-                if (gamepad2.left_bumper) {
-                    liftMotor.setVelocity(1.0 - liftMotor.getPower());
-                    sleep(300L);
-                }
+                target += (int) Math.round(gamepad2.right_stick_y / 0.1);
 
-                if (liftMotor.getCurrentPosition() == liftMotor.getTargetPosition()) {
-                    liftMotor.setVelocity(0.0);
-                }
+                liftMotor.setPower(
+                        controller.calculate(liftMotor.getCurrentPosition(), target)
+                );
+
+//                liftMotor.setTargetPosition(liftMotor.getTargetPosition() + (int)((double)gamepad2.right_stick_y / 0.1));
+//                if (gamepad2.left_bumper) {
+//                    liftMotor.setVelocity(1.0 - liftMotor.getPower());
+//                    sleep(300L);
+//                }
+//
+//                if (liftMotor.getCurrentPosition() == liftMotor.getTargetPosition()) {
+//                    liftMotor.setVelocity(0.0);
+//                }
 
                 telemetry.addData("Front Left Power", frontLeftPower);
                 telemetry.addData("Back Left Power", backLeftPower);
