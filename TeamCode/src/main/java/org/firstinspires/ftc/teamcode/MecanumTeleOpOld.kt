@@ -2,14 +2,14 @@ package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
-import com.qualcomm.robotcore.hardware.Servo
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
 @TeleOp
-class MecanumTeleOp : LinearOpMode() {
+class MecanumTeleOpOld : LinearOpMode() {
     @Throws(InterruptedException::class)
     override fun runOpMode() {
         // Declare our motors
@@ -19,7 +19,7 @@ class MecanumTeleOp : LinearOpMode() {
         val frontRightMotor = hardwareMap.dcMotor["frontRightMotor"]
         val backRightMotor = hardwareMap.dcMotor["backRightMotor"]
 
-        val liftMotor = hardwareMap.dcMotor["liftMotor"]
+        val liftMotor = hardwareMap.dcMotor["liftMotor"] // -11400
         val dumpServo = hardwareMap.servo["dumpServo"]
 
         val armExtendMotor = hardwareMap.dcMotor["armExtendMotor"]
@@ -37,7 +37,16 @@ class MecanumTeleOp : LinearOpMode() {
 
         armLiftRightMotor.direction = DcMotorSimple.Direction.REVERSE
 
+        // lift stuff
+         liftMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+         liftMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+         liftMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+         val posList = intArrayOf(0, -4600, -11400)
+
         waitForStart()
+
+        liftMotor.targetPosition = 0
+        liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
 
         if (isStopRequested) return
 
@@ -64,10 +73,10 @@ class MecanumTeleOp : LinearOpMode() {
             frontRightMotor.power = frontRightPower * mult
             backRightMotor.power = backRightPower * mult
 
-            liftMotor.power = gamepad2.right_stick_y.toDouble() / if (gamepad2.right_stick_y < 0) 1 else 2
+            // liftMotor.power = gamepad2.right_stick_y.toDouble() / if (gamepad2.right_stick_y < 0) 1 else 2
             armExtendMotor.power = gamepad2.left_trigger.toDouble() - gamepad2.right_trigger.toDouble()
-            armLiftLeftMotor.power = gamepad2.left_stick_y.toDouble()
-            armLiftRightMotor.power = gamepad2.left_stick_y.toDouble()
+            armLiftLeftMotor.power = gamepad2.left_stick_y.toDouble() / 3
+            armLiftRightMotor.power = gamepad2.left_stick_y.toDouble() / 3
 
             if (gamepad2.a) {
                 dumpServo.position += 0.005
@@ -89,12 +98,33 @@ class MecanumTeleOp : LinearOpMode() {
                 wristServo.power = 0.0
             }
 
+            if (gamepad2.dpad_left) {
+                liftMotor.targetPosition = posList[1]
+                liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+            } else if (gamepad2.dpad_right) {
+                liftMotor.targetPosition = posList[2]
+                liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+            } else if (gamepad2.right_bumper) {
+                liftMotor.targetPosition = posList[0]
+                liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+            }
+
+            liftMotor.targetPosition += (gamepad2.right_stick_y / 0.1).toInt()
+
+             if (gamepad2.left_bumper) { liftMotor.power = 1.0 - liftMotor.power; sleep(300) }
+            // if (gamepad2.left_bumper) { liftMotor.power = 1.0 }
+            if (liftMotor.currentPosition == liftMotor.targetPosition) { liftMotor.power = 0.0 }
+
+
             telemetry.addData("Front Left Power", frontLeftPower)
             telemetry.addData("Back Left Power", backLeftPower)
             telemetry.addData("Front Right Power", frontRightPower)
             telemetry.addData("Back Right Power", backRightPower)
+
             telemetry.addData("Multiplier", mult)
-            telemetry.addData("Position", dumpServo.position)
+            telemetry.addData("Bucket Position", dumpServo.position)
+            telemetry.addData("Lift Positoin", liftMotor.currentPosition)
+            telemetry.addData("Lift Power", liftMotor.power)
             telemetry.update()
         }
     }
