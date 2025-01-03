@@ -13,21 +13,37 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 @TeleOp
 @Config
 public final class MecanumTeleOp extends LinearOpMode {
+    private DcMotor frontLeftMotor;
+    private DcMotor backLeftMotor;
+    private DcMotor frontRightMotor;
+    private DcMotor backRightMotor;
+
+    private DcMotorEx liftMotor;
+    private Servo dumpServo;
+
+    private DcMotor armExtendMotor;
+    private DcMotor armLiftMotor;
+    private DcMotor wristMotor;
+    private Servo clawServo;
+
     public void runOpMode() throws InterruptedException {
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
+        frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
+        backLeftMotor = hardwareMap.dcMotor.get("backLeftMotor");
+        frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
+        backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
-        DcMotorEx liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
-        Servo dumpServo = hardwareMap.servo.get("dumpServo");
+        liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
+        dumpServo = hardwareMap.servo.get("dumpServo");
 
-        DcMotor armExtendMotor = hardwareMap.dcMotor.get("armExtendMotor");
-        DcMotor armLiftMotor = hardwareMap.dcMotor.get("armLiftMotor");
-        DcMotor wristMotor = hardwareMap.dcMotor.get("wristMotor");
-        Servo clawServo = hardwareMap.servo.get("clawServo");
+        armExtendMotor = hardwareMap.dcMotor.get("armExtendMotor");
+        armLiftMotor = hardwareMap.dcMotor.get("armLiftMotor");
+        wristMotor = hardwareMap.dcMotor.get("wristMotor");
+        clawServo = hardwareMap.servo.get("clawServo");
 
         backRightMotor.setDirection(Direction.REVERSE);
+
+        armLiftMotor.setDirection(Direction.REVERSE);
+
         liftMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setMode(RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
