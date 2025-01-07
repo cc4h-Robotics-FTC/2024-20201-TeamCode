@@ -23,10 +23,9 @@ class MecanumTeleOpOld : LinearOpMode() {
         val dumpServo = hardwareMap.servo["dumpServo"]
 
         val armExtendMotor = hardwareMap.dcMotor["armExtendMotor"]
-        val armLiftLeftMotor = hardwareMap.dcMotor["armLiftLeftMotor"]
-        val armLiftRightMotor = hardwareMap.dcMotor["armLiftRightMotor"]
+        val armLiftMotor = hardwareMap.dcMotor["armLiftMotor"]
 
-        val wristServo = hardwareMap.crservo["wristServo"]
+        val wristMotor = hardwareMap.dcMotor["wristMotor"]
         val clawServo = hardwareMap.servo["clawServo"]
 
         // Reverse the right side motors. This may be wrong for your setup.
@@ -35,18 +34,18 @@ class MecanumTeleOpOld : LinearOpMode() {
         // See the note about this earlier on this page.
         backRightMotor.direction = DcMotorSimple.Direction.REVERSE
 
-        armLiftRightMotor.direction = DcMotorSimple.Direction.REVERSE
+        armLiftMotor.direction = DcMotorSimple.Direction.REVERSE
 
         // lift stuff
-         liftMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
-         liftMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
-         liftMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-         val posList = intArrayOf(0, -4600, -11400)
+//         liftMotor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+//         liftMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+//         liftMotor.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+//         val posList = intArrayOf(0, -4600, -11400)
 
         waitForStart()
 
-        liftMotor.targetPosition = 0
-        liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+//        liftMotor.targetPosition = 0
+//        liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
 
         if (isStopRequested) return
 
@@ -73,10 +72,9 @@ class MecanumTeleOpOld : LinearOpMode() {
             frontRightMotor.power = frontRightPower * mult
             backRightMotor.power = backRightPower * mult
 
-            // liftMotor.power = gamepad2.right_stick_y.toDouble() / if (gamepad2.right_stick_y < 0) 1 else 2
+            liftMotor.power = gamepad2.right_stick_y.toDouble() / if (gamepad2.right_stick_y < 0) 1 else 2
             armExtendMotor.power = gamepad2.left_trigger.toDouble() - gamepad2.right_trigger.toDouble()
-            armLiftLeftMotor.power = gamepad2.left_stick_y.toDouble() / 3
-            armLiftRightMotor.power = gamepad2.left_stick_y.toDouble() / 3
+            armLiftMotor.power = gamepad2.left_stick_y.toDouble() / 3
 
             if (gamepad2.a) {
                 dumpServo.position += 0.005
@@ -91,29 +89,29 @@ class MecanumTeleOpOld : LinearOpMode() {
             }
 
             if (gamepad2.dpad_up) {
-                wristServo.power = 1.0
+                wristMotor.power = 1.0
             } else if (gamepad2.dpad_down) {
-                wristServo.power = -1.0
+                wristMotor.power = -1.0
             } else {
-                wristServo.power = 0.0
+                wristMotor.power = 0.0
             }
 
-            if (gamepad2.dpad_left) {
-                liftMotor.targetPosition = posList[1]
-                liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
-            } else if (gamepad2.dpad_right) {
-                liftMotor.targetPosition = posList[2]
-                liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
-            } else if (gamepad2.right_bumper) {
-                liftMotor.targetPosition = posList[0]
-                liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
-            }
+//            if (gamepad2.dpad_left) {
+//                liftMotor.targetPosition = posList[1]
+//                liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+//            } else if (gamepad2.dpad_right) {
+//                liftMotor.targetPosition = posList[2]
+//                liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+//            } else if (gamepad2.right_bumper) {
+//                liftMotor.targetPosition = posList[0]
+//                liftMotor.mode = DcMotor.RunMode.RUN_TO_POSITION
+//            }
 
-            liftMotor.targetPosition += (gamepad2.right_stick_y / 0.1).toInt()
-
-             if (gamepad2.left_bumper) { liftMotor.power = 1.0 - liftMotor.power; sleep(300) }
-            // if (gamepad2.left_bumper) { liftMotor.power = 1.0 }
-            if (liftMotor.currentPosition == liftMotor.targetPosition) { liftMotor.power = 0.0 }
+//            liftMotor.targetPosition += (gamepad2.right_stick_y / 0.1).toInt()
+//
+//             if (gamepad2.left_bumper) { liftMotor.power = 1.0 - liftMotor.power; sleep(300) }
+//            // if (gamepad2.left_bumper) { liftMotor.power = 1.0 }
+//            if (liftMotor.currentPosition == liftMotor.targetPosition) { liftMotor.power = 0.0 }
 
 
             telemetry.addData("Front Left Power", frontLeftPower)

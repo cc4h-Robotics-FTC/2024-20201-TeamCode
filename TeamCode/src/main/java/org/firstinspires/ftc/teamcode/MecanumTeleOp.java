@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.controller.PController;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp
 @Config
@@ -18,7 +20,7 @@ public final class MecanumTeleOp extends LinearOpMode {
     private DcMotor frontRightMotor;
     private DcMotor backRightMotor;
 
-    private DcMotorEx liftMotor;
+    private DcMotor liftMotor;
     private Servo dumpServo;
 
     private DcMotor armExtendMotor;
@@ -26,9 +28,11 @@ public final class MecanumTeleOp extends LinearOpMode {
     private DcMotor wristMotor;
     private Servo clawServo;
 
-    public static double p = 0, i = 0, d = 0, f = 0;
+    private TouchSensor liftDownSensor;
+    private TouchSensor liftUpSensor;
 
-    private PIDFController controller = new PIDFController(p, i, d, f);
+    private boolean autoDown = false;
+    private boolean autoUp = false;
 
     public void runOpMode() throws InterruptedException {
         frontLeftMotor = hardwareMap.dcMotor.get("frontLeftMotor");
@@ -36,7 +40,7 @@ public final class MecanumTeleOp extends LinearOpMode {
         frontRightMotor = hardwareMap.dcMotor.get("frontRightMotor");
         backRightMotor = hardwareMap.dcMotor.get("backRightMotor");
 
-        liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
+        liftMotor = hardwareMap.dcMotor.get("liftMotor");
         dumpServo = hardwareMap.servo.get("dumpServo");
 
         armExtendMotor = hardwareMap.dcMotor.get("armExtendMotor");
@@ -44,20 +48,15 @@ public final class MecanumTeleOp extends LinearOpMode {
         wristMotor = hardwareMap.dcMotor.get("wristMotor");
         clawServo = hardwareMap.servo.get("clawServo");
 
+        liftDownSensor = hardwareMap.touchSensor.get("liftDownSensor");
+        liftUpSensor = hardwareMap.touchSensor.get("liftDownSensor");
+
+
         backRightMotor.setDirection(Direction.REVERSE);
-
         armLiftMotor.setDirection(Direction.REVERSE);
-
-//        liftMotor.setMode(RunMode.STOP_AND_RESET_ENCODER);
-//        liftMotor.setMode(RunMode.RUN_WITHOUT_ENCODER);
-//        liftMotor.setZeroPowerBehavior(ZeroPowerBehavior.BRAKE);
-        int[] posList = {0, -4600, -11400};
-        int target = 0;
+        wristMotor.setDirection(Direction.REVERSE);
 
         waitForStart();
-
-//        liftMotor.setTargetPosition(0);
-//        liftMotor.setMode(RunMode.RUN_TO_POSITION);
 
         if (!this.isStopRequested()) {
             while(this.opModeIsActive()) {
@@ -81,7 +80,6 @@ public final class MecanumTeleOp extends LinearOpMode {
                 frontRightMotor.setPower(frontRightPower * mult);
                 backRightMotor.setPower(backRightPower * mult);
 
-
                 armExtendMotor.setPower(gamepad2.left_trigger - gamepad2.right_trigger);
                 armLiftMotor.setPower(gamepad2.left_stick_y / 3.0);
 
@@ -92,9 +90,9 @@ public final class MecanumTeleOp extends LinearOpMode {
                 }
 
                 if (gamepad2.x && clawServo.getPosition() < 1.0) {
-                    clawServo.setPosition(clawServo.getPosition() + 0.001);
+                    clawServo.setPosition(clawServo.getPosition() + 0.005);
                 } else if (gamepad2.y && clawServo.getPosition() > 0.0) {
-                    clawServo.setPosition(clawServo.getPosition() - 0.001);
+                    clawServo.setPosition(clawServo.getPosition() - 0.005);
                 }
 
                 if (gamepad2.dpad_up) {
@@ -105,35 +103,43 @@ public final class MecanumTeleOp extends LinearOpMode {
                     wristMotor.setPower(0.0);
                 }
 
-                if (gamepad2.dpad_left) {
-//                    liftMotor.setTargetPosition(posList[1]);
-//                    liftMotor.setMode(RunMode.RUN_TO_POSITION);
-                    target = posList[1];
-                } else if (gamepad2.dpad_right) {
-//                    liftMotor.setTargetPosition(posList[2]);
-//                    liftMotor.setMode(RunMode.RUN_TO_POSITION);
-                    target = posList[2];
-                } else if (gamepad2.right_bumper) {
-//                    liftMotor.setTargetPosition(posList[0]);
-//                    liftMotor.setMode(RunMode.RUN_TO_POSITION);
-                    target = posList[0];
+                if (gamepad2.right_bumper) {
+                    autoDown = !autoDown;
+                    sleep(300);
                 }
 
-                target += (int) Math.round(gamepad2.right_stick_y / 0.1);
+                if (gamepad2.left_bumper) {
+                    autoUp = !autoUp;
+                    sleep(300);
+                }
 
-                liftMotor.setPower(
-                        controller.calculate(liftMotor.getCurrentPosition(), target)
-                );
+                if (autoDown) {
+                    liftMotor.setPower(1.0);
+                } else if (autoUp) {
+                    liftMotor.setPower(-1.0);
+                } else {
+                    liftMotor.setPower(gamepad2.right_stick_y);
+                }
 
-//                liftMotor.setTargetPosition(liftMotor.getTargetPosition() + (int)((double)gamepad2.right_stick_y / 0.1));
-//                if (gamepad2.left_bumper) {
-//                    liftMotor.setVelocity(1.0 - liftMotor.getPower());
-//                    sleep(300L);
-//                }
-//
-//                if (liftMotor.getCurrentPosition() == liftMotor.getTargetPosition()) {
-//                    liftMotor.setVelocity(0.0);
-//                }
+                if (liftDownSensor.isPressed() && autoDown) {
+                    liftMotor.setPower(-0.5);
+                    sleep(500);
+                    liftMotor.setPower(0.0);
+                    autoDown = false;
+                    autoUp = false;
+                }
+
+                if (liftUpSensor.isPressed() && autoUp) {
+                    liftMotor.setPower(0.5);
+                    sleep(500);
+                    liftMotor.setPower(0.0);
+                    autoDown = false;
+                    autoUp = false;
+                }
+
+                if (gamepad1.dpad_left && gamepad2.dpad_left) {
+                    requestOpModeStop();
+                }
 
                 telemetry.addData("Front Left Power", frontLeftPower);
                 telemetry.addData("Back Left Power", backLeftPower);
@@ -141,8 +147,10 @@ public final class MecanumTeleOp extends LinearOpMode {
                 telemetry.addData("Back Right Power", backRightPower);
                 telemetry.addData("Multiplier", mult);
                 telemetry.addData("Bucket Position", dumpServo.getPosition());
-                telemetry.addData("Lift Positoin", liftMotor.getCurrentPosition());
-                telemetry.addData("Lift Power", liftMotor.getVelocity());
+//                telemetry.addData("Lift Positoin", liftMotor.getCurrentPosition());
+                telemetry.addData("Lift Power", liftMotor.getPower());
+                telemetry.addData("Lift Down Sensor", liftDownSensor.isPressed());
+                telemetry.addData("Lift Up Sensor", liftUpSensor.isPressed());
                 telemetry.update();
             }
         }
