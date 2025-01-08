@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
-import com.arcrobotics.ftclib.hardware.RevIMU;
+import com.arcrobotics.ftclib.hardware.ServoEx;
+import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -17,12 +20,16 @@ public class DucksAuto extends LinearOpMode {
     public static double d = 0.0;
     public static double tpi = 43.577;
     public static double tpli = 39.191;
-    public static double tpd = 10.0;
-
-
-
+    public static double tpd = 35;
     @Override
     public void runOpMode() throws InterruptedException {
+        Motor armLiftMotor = new Motor(hardwareMap, "armLiftMotor");
+        Motor wristMotor = new Motor(hardwareMap, "wristMotor");
+        ServoEx clawServo = new SimpleServo(hardwareMap, "clawServo", 0, 90);
+
+        Motor liftMotor = new Motor(hardwareMap, "liftMotor");
+        ServoEx dumperServo = new SimpleServo(hardwareMap, "dumperServo", 0, 180);
+
         Motor[] motors = {
                 new Motor(hardwareMap, "frontLeftMotor"),
                 new Motor(hardwareMap, "frontRightMotor"),
@@ -40,7 +47,7 @@ public class DucksAuto extends LinearOpMode {
         MecanumAuto robot = new MecanumAuto(
                 motors,
                 hardwareMap,
-                telemetry,
+                new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry()),
                 new PIDController(p, i, d),
                 tpi,
                 tpli,
@@ -50,11 +57,35 @@ public class DucksAuto extends LinearOpMode {
 
         waitForStart();
 
-        Pose2d target = new Pose2d(0, 64, new Rotation2d(0));
-
-        while (!isStopRequested()) {
-            robot.forward(64);
-            robot.forward(-64);
-        }
+        armLiftMotor.set(1.0); // Put down arm
+        robot.driveByIn(new Pose2d(32.0, 10.0, new Rotation2d(0.0))); // Light up with bar
+        armLiftMotor.set(0.0);
+        robot.driveByIn(new Pose2d(0.0, 18.0, new Rotation2d(0.0))); // Drive forward some more
+        wristMotor.set(1.0); // Clip specimen
+        sleep(500);
+        wristMotor.set(0.0);
+        clawServo.turnToAngle(45.0); // Let go of specimen
+        wristMotor.set(1.0); // Put wrist down all the way
+        sleep(500);
+        wristMotor.set(0.0);
+        robot.driveByIn(new Pose2d(-48.0, -6.0, new Rotation2d(0.0))); // Drive to first sample
+        clawServo.turnToAngle(0); // Grab sample
+        wristMotor.set(-1.0); // Curl up wrist
+        sleep(500);
+        wristMotor.set(0.0);
+        armLiftMotor.set(1.0); // Lift Arm
+        sleep(2000);
+        armLiftMotor.set(0.0);
+        clawServo.turnToAngle(45); // Drop sample into dumper
+        sleep(500);
+        armLiftMotor.set(-1.0); // Put down arm
+        liftMotor.set(1.0); // Lift lift
+        robot.driveByIn(new Pose2d(-4.0, -12.0, new Rotation2d(-45)));
+        liftMotor.set(0.0);
+        armLiftMotor.set(0.0);
+        dumperServo.turnToAngle(180.0); // Dump sample
+        liftMotor.set(-1.0); // Put down lift
+        robot.driveByIn(new Pose2d(88.0, -8.0, new Rotation2d(0))); // Park
+        liftMotor.set(0.0);
     }
 }
