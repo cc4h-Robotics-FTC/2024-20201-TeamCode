@@ -14,14 +14,21 @@ public class DucksTankTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        Motor frontLeftMotor = new Motor(hardwareMap, "frontLeftMotor");
+        Motor frontRightMotor = new Motor(hardwareMap, "frontRightMotor");
+        Motor backLeftMotor = new Motor(hardwareMap, "backLeftMotor");
+        Motor backRightMotor = new Motor(hardwareMap, "backRightMotor");
+
+        frontRightMotor.setInverted(true);
+
         MotorGroup left = new MotorGroup(
-                new Motor(hardwareMap, "frontLeftMotor"),
-                new Motor(hardwareMap, "backLeftMotor")
+                frontLeftMotor,
+                backLeftMotor
         );
 
         MotorGroup right = new MotorGroup(
-                new Motor(hardwareMap, "frontRightMotor"),
-                new Motor(hardwareMap, "backRightMotor")
+                frontRightMotor,
+                backRightMotor
         );
 
         DifferentialDrive drive = new DifferentialDrive(

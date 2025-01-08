@@ -19,13 +19,20 @@ public class DucksTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        Motor frontLeftMotor = new Motor(hardwareMap, "frontLeftMotor");
+        Motor frontRightMotor = new Motor(hardwareMap, "frontRightMotor");
+        Motor backLeftMotor = new Motor(hardwareMap, "backLeftMotor");
+        Motor backRightMotor = new Motor(hardwareMap, "backRightMotor");
+
+        frontRightMotor.setInverted(true);
+
         // constructor takes in frontLeft, frontRight, backLeft, backRight motors
         // IN THAT ORDER
         MecanumDrive drive = new MecanumDrive(
-                new Motor(hardwareMap, "frontLeftMotor"),
-                new Motor(hardwareMap, "frontRightMotor"),
-                new Motor(hardwareMap, "backLeftMotor"),
-                new Motor(hardwareMap, "backRightMotor")
+                frontLeftMotor,
+                frontRightMotor,
+                backLeftMotor,
+                backRightMotor
         );
 
         // This is the built-in IMU in the REV hub.
