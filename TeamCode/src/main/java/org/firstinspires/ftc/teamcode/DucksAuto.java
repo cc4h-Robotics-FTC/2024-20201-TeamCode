@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Config
 @Autonomous
 public class DucksAuto extends LinearOpMode {
-    public static double p = 1.0;
+    public static double p = 1.7;
     public static double i = 0.0;
     public static double d = 0.0;
     public static double tpi = 43.577;
@@ -28,7 +28,7 @@ public class DucksAuto extends LinearOpMode {
         ServoEx clawServo = new SimpleServo(hardwareMap, "clawServo", 0, 90);
 
         Motor liftMotor = new Motor(hardwareMap, "liftMotor");
-        ServoEx dumperServo = new SimpleServo(hardwareMap, "dumperServo", 0, 180);
+        ServoEx dumpServo = new SimpleServo(hardwareMap, "dumpServo", 0, 180);
 
         Motor[] motors = {
                 new Motor(hardwareMap, "frontLeftMotor"),
@@ -38,6 +38,9 @@ public class DucksAuto extends LinearOpMode {
         };
 
         motors[1].setInverted(true);
+        motors[1].encoder.setDirection(Motor.Direction.REVERSE);
+        motors[3].encoder.setDirection(Motor.Direction.REVERSE);
+
 
         motors[0].resetEncoder();
         motors[1].resetEncoder();
@@ -58,7 +61,7 @@ public class DucksAuto extends LinearOpMode {
         waitForStart();
 
         armLiftMotor.set(1.0); // Put down arm
-        robot.driveByIn(new Pose2d(32.0, 10.0, new Rotation2d(0.0))); // Light up with bar
+        robot.driveByIn(new Pose2d(10.0, 32.0, new Rotation2d(0.0))); // Light up with bar
         armLiftMotor.set(0.0);
         robot.driveByIn(new Pose2d(0.0, 18.0, new Rotation2d(0.0))); // Drive forward some more
         wristMotor.set(1.0); // Clip specimen
@@ -83,7 +86,7 @@ public class DucksAuto extends LinearOpMode {
         robot.driveByIn(new Pose2d(-4.0, -12.0, new Rotation2d(-45)));
         liftMotor.set(0.0);
         armLiftMotor.set(0.0);
-        dumperServo.turnToAngle(180.0); // Dump sample
+        dumpServo.turnToAngle(180.0); // Dump sample
         liftMotor.set(-1.0); // Put down lift
         robot.driveByIn(new Pose2d(88.0, -8.0, new Rotation2d(0))); // Park
         liftMotor.set(0.0);

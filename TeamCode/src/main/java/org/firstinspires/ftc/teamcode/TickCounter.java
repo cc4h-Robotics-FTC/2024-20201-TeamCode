@@ -17,6 +17,9 @@ public class TickCounter extends LinearOpMode {
         };
 
         motors[1].setInverted(true);
+        motors[1].encoder.setDirection(Motor.Direction.REVERSE);
+        motors[3].encoder.setDirection(Motor.Direction.REVERSE);
+
         motors[0].resetEncoder();
         motors[1].resetEncoder();
         motors[2].resetEncoder();
