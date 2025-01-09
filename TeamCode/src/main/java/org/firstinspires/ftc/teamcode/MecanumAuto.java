@@ -7,14 +7,15 @@ import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
 public class MecanumAuto {
-    private MecanumDrive drive;
-    private Motor[] motors;
+//    private MecanumDrive drive;
+    private MotorEx[] motors;
     private HardwareMap hw;
     private Telemetry telemetry;
     private RevIMU imu;
@@ -24,16 +25,14 @@ public class MecanumAuto {
     private double ticksPerDegree;
     private Pose2d pos;
 
-    public MecanumAuto(Motor[] motors, HardwareMap hw, Telemetry telemetry, PIDController pid, double ticksPerInch, double ticksPerLateralInch, double ticksPerDegree, Pose2d startPos) {
+    public MecanumAuto(MotorEx[] motors, HardwareMap hw, Telemetry telemetry, PIDController pid, double ticksPerInch, double ticksPerLateralInch, double ticksPerDegree, Pose2d startPos) {
         this.motors = motors;
-        this.drive = new MecanumDrive(
-                this.motors[0],
-                this.motors[1],
-                this.motors[2],
-                this.motors[3]
-        );
+//        this.motors[0].setRunMode(Motor.RunMode.VelocityControl);
+//        this.motors[1].setRunMode(Motor.RunMode.VelocityControl);
+//        this.motors[2].setRunMode(Motor.RunMode.VelocityControl);
+//        this.motors[3].setRunMode(Motor.RunMode.VelocityControl);
         this.hw = hw;
-        this.imu = new RevIMU(hw);
+        this.imu = new RevIMU(this.hw);
         this.telemetry = telemetry;
         this.pid = pid;
         this.ticksPerInch = ticksPerInch;
@@ -54,6 +53,14 @@ public class MecanumAuto {
                 motors[3].getCurrentPosition() + pos.getY() + pos.getX() - pos.getHeading()
         };
 
+        boolean[] motorsDone = {
+                false,
+                false,
+                false,
+                false
+        };
+        boolean done = false;
+
         double avgError = Math.abs(
                 targets[0] - motors[0].getCurrentPosition() +
                         targets[1] - motors[1].getCurrentPosition() +
@@ -61,13 +68,25 @@ public class MecanumAuto {
                         targets[3] - motors[3].getCurrentPosition()
         ) / 4;
 
-        while (avgError > 3) {
-            drive.driveWithMotorPowers(
-                    pid.calculate(motors[0].getCurrentPosition(), targets[0]),
-                    pid.calculate(motors[1].getCurrentPosition(), targets[1]),
-                    pid.calculate(motors[2].getCurrentPosition(), targets[2]),
-                    pid.calculate(motors[3].getCurrentPosition(), targets[3])
-            );
+        while (!done) {
+//            pid.setSetPoint(targets[0]);
+            motors[0].setVelocity(pid.calculate(motors[0].getCurrentPosition(), targets[0]));
+            motorsDone[0] = pid.atSetPoint();
+
+//            pid.setSetPoint(targets[1]);
+            motors[1].setVelocity(pid.calculate(motors[1].getCurrentPosition(), targets[1]));
+            motorsDone[1] = pid.atSetPoint();
+
+//            pid.setSetPoint(targets[2]);
+            motors[2].setVelocity(pid.calculate(motors[2].getCurrentPosition(), targets[2]));
+            motorsDone[2] = pid.atSetPoint();
+
+//            pid.setSetPoint(targets[3]);
+            motors[3].setVelocity(pid.calculate(motors[3].getCurrentPosition(), targets[3]));
+            motorsDone[3] = pid.atSetPoint();
+
+            done = motorsDone[0] && motorsDone[1] && motorsDone[2] && motorsDone[3];
+
             avgError = Math.abs(
                     targets[0] - motors[0].getCurrentPosition() +
                             targets[1] - motors[1].getCurrentPosition() +
@@ -87,10 +106,14 @@ public class MecanumAuto {
             telemetry.addData("FR error", motors[1].getCurrentPosition() - targets[1]);
             telemetry.addData("BL error", motors[2].getCurrentPosition() - targets[2]);
             telemetry.addData("BR error", motors[3].getCurrentPosition() - targets[3]);
-            telemetry.addData("FL power", motors[0].get());
-            telemetry.addData("FR power", motors[1].get());
-            telemetry.addData("BL power", motors[2].get());
-            telemetry.addData("BR power", motors[0].get());
+            telemetry.addData("FL velocity", motors[0].getVelocity());
+            telemetry.addData("FR velocity", motors[1].getVelocity());
+            telemetry.addData("BL velocity", motors[2].getVelocity());
+            telemetry.addData("BR velocity", motors[3].getVelocity());
+            telemetry.addData("FL done", motorsDone[0]);
+            telemetry.addData("FR done", motorsDone[1]);
+            telemetry.addData("BL done", motorsDone[2]);
+            telemetry.addData("BR done", motorsDone[3]);
             telemetry.update();
         }
     }
@@ -122,12 +145,11 @@ public class MecanumAuto {
         ) / 4;
 
         while (avgError > 3) {
-            drive.driveWithMotorPowers(
-                    pid.calculate(motors[0].getCurrentPosition(), targets[0]),
-                    pid.calculate(motors[1].getCurrentPosition(), targets[1]),
-                    pid.calculate(motors[2].getCurrentPosition(), targets[2]),
-                    pid.calculate(motors[3].getCurrentPosition(), targets[3])
-            );
+            motors[0].setVelocity(pid.calculate(motors[0].getCurrentPosition(), targets[0]));
+            motors[1].setVelocity(pid.calculate(motors[1].getCurrentPosition(), targets[1]));
+            motors[2].setVelocity(pid.calculate(motors[2].getCurrentPosition(), targets[2]));
+            motors[3].setVelocity(pid.calculate(motors[3].getCurrentPosition(), targets[3]));
+
             avgTicks = (
                     motors[0].getCurrentPosition() +
                     motors[1].getCurrentPosition() +
