@@ -83,13 +83,13 @@ public final class MecanumTeleOp extends LinearOpMode {
                 armExtendMotor.setPower(gamepad2.left_trigger - gamepad2.right_trigger);
                 armLiftMotor.setPower(gamepad2.left_stick_y / 3.0);
 
-                if (gamepad2.a) {
+                if (gamepad2.a && dumpServo.getPosition() < 0.75) {
                     dumpServo.setPosition(dumpServo.getPosition() + 0.005);
-                } else if (gamepad2.b) {
+                } else if (gamepad2.b && dumpServo.getPosition() > 0.0) {
                     dumpServo.setPosition(dumpServo.getPosition() - 0.005);
                 }
 
-                if (gamepad2.x && clawServo.getPosition() < 1.0) {
+                if (gamepad2.x && clawServo.getPosition() < 0.65) {
                     clawServo.setPosition(clawServo.getPosition() + 0.005);
                 } else if (gamepad2.y && clawServo.getPosition() > 0.0) {
                     clawServo.setPosition(clawServo.getPosition() - 0.005);
@@ -108,15 +108,15 @@ public final class MecanumTeleOp extends LinearOpMode {
                     sleep(300);
                 }
 
-                if (gamepad2.left_bumper) {
-                    autoUp = !autoUp;
-                    sleep(300);
-                }
+//                if (gamepad2.left_bumper) {
+//                    autoUp = !autoUp;
+//                    sleep(300);
+//                }
 
                 if (autoDown) {
                     liftMotor.setPower(1.0);
-                } else if (autoUp) {
-                    liftMotor.setPower(-1.0);
+//                } else if (autoUp) {
+//                    liftMotor.setPower(-1.0);
                 } else {
                     liftMotor.setPower(gamepad2.right_stick_y);
                 }
@@ -147,6 +147,7 @@ public final class MecanumTeleOp extends LinearOpMode {
                 telemetry.addData("Back Right Power", backRightPower);
                 telemetry.addData("Multiplier", mult);
                 telemetry.addData("Bucket Position", dumpServo.getPosition());
+                telemetry.addData("Claw Positoin", clawServo.getPosition());
 //                telemetry.addData("Lift Positoin", liftMotor.getCurrentPosition());
                 telemetry.addData("Lift Power", liftMotor.getPower());
                 telemetry.addData("Lift Down Sensor", liftDownSensor.isPressed());

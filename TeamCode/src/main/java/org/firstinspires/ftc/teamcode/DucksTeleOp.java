@@ -4,9 +4,11 @@ import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.RevIMU;
+import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp
 public class DucksTeleOp extends LinearOpMode {
@@ -19,12 +21,22 @@ public class DucksTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        double mult = 1.0;
+
         Motor frontLeftMotor = new Motor(hardwareMap, "frontLeftMotor");
         Motor frontRightMotor = new Motor(hardwareMap, "frontRightMotor");
         Motor backLeftMotor = new Motor(hardwareMap, "backLeftMotor");
         Motor backRightMotor = new Motor(hardwareMap, "backRightMotor");
 
-        frontRightMotor.setInverted(true);
+        Motor liftMotor = new Motor(hardwareMap, "liftMotor");
+        Motor armMotor = new Motor(hardwareMap, "armMotor");
+        Motor wristMotor = new Motor(hardwareMap, "wristMotor");
+        SimpleServo clawServo = new SimpleServo(hardwareMap, "clawServo", 0, 180);
+
+        backRightMotor.setInverted(true);
+
+        liftMotor.setInverted(true);
+        wristMotor.setInverted(true);
 
         // constructor takes in frontLeft, frontRight, backLeft, backRight motors
         // IN THAT ORDER
@@ -59,6 +71,7 @@ public class DucksTeleOp extends LinearOpMode {
 
         // the extended gamepad object
         GamepadEx driverOp = new GamepadEx(gamepad1);
+        GamepadEx armOp = new GamepadEx(gamepad2);
 
         waitForStart();
 
@@ -90,9 +103,9 @@ public class DucksTeleOp extends LinearOpMode {
 
                 // optional fourth parameter for squared inputs
                 drive.driveRobotCentric(
-                        driverOp.getLeftX(),
-                        driverOp.getLeftY(),
-                        driverOp.getRightX(),
+                        -driverOp.getLeftX() * mult,
+                        driverOp.getLeftY() * mult,
+                        driverOp.getRightX() * mult,
                         false
                 );
             } else {
@@ -114,17 +127,47 @@ public class DucksTeleOp extends LinearOpMode {
 
                 // optional fifth parameter for squared inputs
                 drive.driveFieldCentric(
-                        driverOp.getLeftX(),
-                        driverOp.getLeftY(),
-                        driverOp.getRightX(),
+                        -driverOp.getLeftX() * mult,
+                        driverOp.getLeftY() * mult,
+                        driverOp.getRightX() * mult,
                         imu.getRotation2d().getDegrees(),   // gyro value passed in here must be in degrees
                         false
                 );
             }
 
             if (driverOp.wasJustPressed(GamepadKeys.Button.A)) FIELD_CENTRIC = !FIELD_CENTRIC;
+            if (driverOp.wasJustPressed(GamepadKeys.Button.B)) imu.reset();
+
+            if (driverOp.isDown(GamepadKeys.Button.LEFT_BUMPER)) mult = 0.5;
+            else if (driverOp.isDown(GamepadKeys.Button.RIGHT_BUMPER)) mult = 0.25;
+            else mult = 1.0;
+
+            liftMotor.set(armOp.getRightY());
+            armMotor.set(armOp.getLeftY());
+
+            if (armOp.isDown(GamepadKeys.Button.B)) clawServo.rotateByAngle(0.1);
+            if (armOp.isDown(GamepadKeys.Button.X)) clawServo.rotateByAngle(-0.1);
+
+            if (armOp.isDown(GamepadKeys.Button.DPAD_UP)) wristMotor.set(1.0);
+            else if (armOp.isDown(GamepadKeys.Button.DPAD_DOWN)) wristMotor.set(-1.0);
+            else wristMotor.set(0.0);
+
+//            if (armOp.wasJustPressed(GamepadKeys.Button.X)) {
+//                clawServo.rotateByAngle(25);
+//                sleep(500);
+//                liftMotor.set(1.0);
+//                sleep(3000);
+//                liftMotor.stopMotor();
+//                clawServo.rotateByAngle(-25);
+//                sleep(500);
+//            }
 
             driverOp.readButtons();
+            armOp.readButtons();
+
+            telemetry.addData("FC", FIELD_CENTRIC);
+            telemetry.addData("CP", clawServo.getPosition());
+            telemetry.update();
         }
     }
 
