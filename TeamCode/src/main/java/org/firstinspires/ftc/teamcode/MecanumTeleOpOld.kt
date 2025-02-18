@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DcMotor
@@ -8,6 +9,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+@Disabled
 @TeleOp
 class MecanumTeleOpOld : LinearOpMode() {
     @Throws(InterruptedException::class)
