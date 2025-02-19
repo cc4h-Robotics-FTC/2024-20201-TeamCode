@@ -145,12 +145,12 @@ public class DucksTeleOp extends LinearOpMode {
             liftMotor.set(armOp.getRightY());
             armMotor.set(armOp.getLeftY());
 
-            if (armOp.isDown(GamepadKeys.Button.B)) clawServo.rotateByAngle(0.1);
-            if (armOp.isDown(GamepadKeys.Button.X)) clawServo.rotateByAngle(-0.1);
+            if (armOp.isDown(GamepadKeys.Button.B)) clawServo.rotateByAngle(0.3);
+            if (armOp.isDown(GamepadKeys.Button.X)) clawServo.rotateByAngle(-0.3);
 
-            if (armOp.isDown(GamepadKeys.Button.DPAD_UP)) wristMotor.set(1.0);
-            else if (armOp.isDown(GamepadKeys.Button.DPAD_DOWN)) wristMotor.set(-1.0);
-            else wristMotor.set(0.0);
+            if (armOp.isDown(GamepadKeys.Button.DPAD_UP)) wristMotor.set(0.5);
+            else if (armOp.isDown(GamepadKeys.Button.DPAD_DOWN)) wristMotor.set(-0.5);
+            else wristMotor.set(armOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - armOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
 
 //            if (armOp.wasJustPressed(GamepadKeys.Button.X)) {
 //                clawServo.rotateByAngle(25);

@@ -63,16 +63,26 @@ public class SampleAuto extends LinearOpMode {
         clawServo.setPosition(0);
         // sleep(20000);
 
+        // put down arm and wrist
         armMotor.set(1.0);
         wristMotor.set(0.5);
-        robot.driveByIn(new Pose2d(0, 20, new Rotation2d(0)));
+        sleep(1000);
         wristMotor.stopMotor();
         armMotor.stopMotor();
 
-        wristMotor.set(0.5);
+        // drop sample
         clawServo.setPosition(0.5);
         sleep(1000);
+
+        // put up wrist to drive
+        wristMotor.set(0.5);
+        sleep(500);
         wristMotor.stopMotor();
+
+        // park
+        drive.driveRobotCentric(0.0, -0.5, 0.0);
+        sleep(1000);
+        drive.stop();
 
         robot.driveByIn(new Pose2d(0, -60, new Rotation2d(0)));
         robot.driveByIn(new Pose2d(-10, 0, new Rotation2d(0)));

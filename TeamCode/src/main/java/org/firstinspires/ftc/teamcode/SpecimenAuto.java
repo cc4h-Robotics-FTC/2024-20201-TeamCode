@@ -58,20 +58,24 @@ public class SpecimenAuto extends LinearOpMode {
         // sleep(20000);
 
         liftMotor.set(1.0);
-        sleep(1000);
+        sleep(500);
         liftMotor.stopMotor();
 
-        drive.driveRobotCentric(1.0, 0.0, 0.0);
+        drive.driveRobotCentric(0.5, 0.0, 0.0);
         sleep(1000);
         drive.stop();
 
-        liftMotor.set(-1.0);
+        liftMotor.set(1.0);
         sleep(1000);
         liftMotor.stopMotor();
 
-        robot.driveByIn(new Pose2d(-20, 0, new Rotation2d(0)));
-        robot.driveByIn(new Pose2d(0, 48, new Rotation2d(0)));
-        robot.driveByIn(new Pose2d(-10, 0, new Rotation2d(0)));
+        drive.driveRobotCentric(-0.5, -0.5, 0.0);
+        sleep(1000);
+        drive.stop();
+
+//        robot.driveByIn(new Pose2d(-20, 0, new Rotation2d(0)));
+//        robot.driveByIn(new Pose2d(0, 48, new Rotation2d(0)));
+//        robot.driveByIn(new Pose2d(-10, 0, new Rotation2d(0)));
 
         telemetry.addData("Done", "Done");
         telemetry.update();
