@@ -19,10 +19,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 public class SpecimenAuto extends LinearOpMode {
     public static long liftUpDelay = 3500;
     public static long slamIntoWallDelay = 3000;
-    public static long backOffDelay = 90;
+    public static long backOffDelay = 0; //90;
     public static long liftDownDelay = 2000;
     public static long parkDelay = 2500;
-    public static double backOffSpeed = 0.5;
+    public static double backOffSpeed = 0; //0.5;
     public static double parkForwardSpeed = -0.5;
     public static double parkStrafeSpeed = 0.5;
     @Override

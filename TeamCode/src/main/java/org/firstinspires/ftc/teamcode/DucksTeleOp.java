@@ -135,8 +135,8 @@ public class DucksTeleOp extends LinearOpMode {
                 );
             }
 
-            if (driverOp.wasJustPressed(GamepadKeys.Button.A)) FIELD_CENTRIC = !FIELD_CENTRIC;
-            if (driverOp.wasJustPressed(GamepadKeys.Button.B)) imu.reset();
+            if (driverOp.wasJustPressed(GamepadKeys.Button.A) && driverOp.isDown(GamepadKeys.Button.Y)) FIELD_CENTRIC = !FIELD_CENTRIC;
+            if (driverOp.wasJustPressed(GamepadKeys.Button.B) && driverOp.isDown(GamepadKeys.Button.Y)) imu.reset();
 
             if (driverOp.isDown(GamepadKeys.Button.LEFT_BUMPER)) mult = 0.5;
             else if (driverOp.isDown(GamepadKeys.Button.RIGHT_BUMPER)) mult = 0.25;
@@ -145,22 +145,22 @@ public class DucksTeleOp extends LinearOpMode {
             liftMotor.set(armOp.getRightY());
             armMotor.set(armOp.getLeftY());
 
-            if (armOp.isDown(GamepadKeys.Button.B)) clawServo.rotateByAngle(0.3);
+            if (armOp.isDown(GamepadKeys.Button.B)) clawServo.rotateByAngle(0.4);
             if (armOp.isDown(GamepadKeys.Button.X)) clawServo.rotateByAngle(-0.3);
 
             if (armOp.isDown(GamepadKeys.Button.DPAD_UP)) wristMotor.set(0.5);
             else if (armOp.isDown(GamepadKeys.Button.DPAD_DOWN)) wristMotor.set(-0.5);
             else wristMotor.set(armOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - armOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
 
-//            if (armOp.wasJustPressed(GamepadKeys.Button.X)) {
-//                clawServo.rotateByAngle(25);
-//                sleep(500);
-//                liftMotor.set(1.0);
-//                sleep(3000);
-//                liftMotor.stopMotor();
-//                clawServo.rotateByAngle(-25);
-//                sleep(500);
-//            }
+            if (driverOp.isDown(GamepadKeys.Button.X) && armOp.isDown(GamepadKeys.Button.X)) {
+                drive.driveRobotCentric(-0.5, 0.0, 0.0);
+                sleep(2000);
+                drive.stop();
+
+                liftMotor.set(-1.0);
+                sleep(3000);
+                liftMotor.stopMotor();
+            }
 
             driverOp.readButtons();
             armOp.readButtons();
