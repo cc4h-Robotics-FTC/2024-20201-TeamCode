@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
@@ -13,8 +14,16 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+@Config
 @Autonomous
 public class SpecimenAuto extends LinearOpMode {
+    public static long liftUpDelay = 3500;
+    public static long slamIntoWallDelay = 3000;
+    public static long backOffDelay = 90;
+    public static long liftDownDelay = 2000;
+    public static long parkDelay = 2500;
+    public static double parkForwardSpeed = -0.5;
+    public static double parkStrafeSpeed = 0.5;
     @Override
     public void runOpMode() throws InterruptedException {
         Motor liftMotor = new Motor(hardwareMap, "liftMotor");
@@ -57,23 +66,23 @@ public class SpecimenAuto extends LinearOpMode {
         // sleep(20000);
 
         liftMotor.set(1.0);
-        sleep(7000);
+        sleep(liftUpDelay);
         liftMotor.stopMotor();
 
         drive.driveRobotCentric(-0.5, 0.0, 0.0);
-        sleep(2500);
+        sleep(slamIntoWallDelay);
         drive.stop();
 
         drive.driveRobotCentric(0.5, 0.0, 0.0);
-        sleep(100);
+        sleep(backOffDelay);
         drive.stop();
 
         liftMotor.set(-1.0);
-        sleep(2000);
+        sleep(liftDownDelay);
         liftMotor.stopMotor();
 
-        drive.driveRobotCentric(0.5, -0.5, 0.0);
-        sleep(2000);
+        drive.driveRobotCentric(parkStrafeSpeed, parkForwardSpeed, 0.0);
+        sleep(parkDelay);
         drive.stop();
 
 //        robot.driveByIn(new Pose2d(-20, 0, new Rotation2d(0)));
