@@ -18,7 +18,6 @@ public class SpecimenAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Motor liftMotor = new Motor(hardwareMap, "liftMotor");
-        liftMotor.setInverted(true);
 
         MotorEx[] motors = {
                 new MotorEx(hardwareMap, "frontLeftMotor"),
@@ -58,19 +57,23 @@ public class SpecimenAuto extends LinearOpMode {
         // sleep(20000);
 
         liftMotor.set(1.0);
-        sleep(500);
+        sleep(7000);
         liftMotor.stopMotor();
 
-        drive.driveRobotCentric(0.5, 0.0, 0.0);
-        sleep(1000);
+        drive.driveRobotCentric(-0.5, 0.0, 0.0);
+        sleep(2500);
         drive.stop();
 
-        liftMotor.set(1.0);
-        sleep(1000);
+        drive.driveRobotCentric(0.5, 0.0, 0.0);
+        sleep(100);
+        drive.stop();
+
+        liftMotor.set(-1.0);
+        sleep(2000);
         liftMotor.stopMotor();
 
-        drive.driveRobotCentric(-0.5, -0.5, 0.0);
-        sleep(1000);
+        drive.driveRobotCentric(0.5, -0.5, 0.0);
+        sleep(2000);
         drive.stop();
 
 //        robot.driveByIn(new Pose2d(-20, 0, new Rotation2d(0)));
