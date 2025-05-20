@@ -103,9 +103,9 @@ public class DucksTeleOp extends LinearOpMode {
 
                 // optional fourth parameter for squared inputs
                 drive.driveRobotCentric(
-                        -driverOp.getLeftX() * mult,
-                        driverOp.getLeftY() * mult,
-                        driverOp.getRightX() * mult,
+                        -driverOp.getRightX() * mult,
+                        driverOp.getRightY() * mult,
+                        driverOp.getLeftX() * mult,
                         false
                 );
             } else {
@@ -127,9 +127,9 @@ public class DucksTeleOp extends LinearOpMode {
 
                 // optional fifth parameter for squared inputs
                 drive.driveFieldCentric(
-                        -driverOp.getLeftX() * mult,
-                        driverOp.getLeftY() * mult,
-                        driverOp.getRightX() * mult,
+                        -driverOp.getRightX() * mult,
+                        driverOp.getRightY() * mult,
+                        driverOp.getLeftX() * mult,
                         imu.getRotation2d().getDegrees(),   // gyro value passed in here must be in degrees
                         false
                 );
