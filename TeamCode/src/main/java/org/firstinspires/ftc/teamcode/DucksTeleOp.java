@@ -29,7 +29,8 @@ public class DucksTeleOp extends LinearOpMode {
         Motor backRightMotor = new Motor(hardwareMap, "backRightMotor");
 
         Motor liftMotor = new Motor(hardwareMap, "liftMotor");
-        Motor armMotor = new Motor(hardwareMap, "armMotor");
+        Motor armMotor1 = new Motor(hardwareMap, "armMotor1");
+        Motor armMotor2 = new Motor(hardwareMap, "armMotor2");
         Motor wristMotor = new Motor(hardwareMap, "wristMotor");
         SimpleServo clawServo = new SimpleServo(hardwareMap, "clawServo", 0, 180);
 
@@ -57,7 +58,7 @@ public class DucksTeleOp extends LinearOpMode {
         //                           |
         //     (Motor Port Side)     |   / X axis
         //                       ____|__/____
-        //          Y axis     / *   | /    /|   (IO Side)
+        //          Y axis     / *   | /        /|   (IO Side)
         //          _________ /______|/    //      I2C
         //                   /___________ //     Digital
         //                  |____________|/      Analog
@@ -104,7 +105,7 @@ public class DucksTeleOp extends LinearOpMode {
                 // optional fourth parameter for squared inputs
                 drive.driveRobotCentric(
                         -driverOp.getRightX() * mult,
-                        driverOp.getRightY() * mult,
+                        -driverOp.getRightY() * mult,
                         driverOp.getLeftX() * mult,
                         false
                 );
@@ -128,7 +129,7 @@ public class DucksTeleOp extends LinearOpMode {
                 // optional fifth parameter for squared inputs
                 drive.driveFieldCentric(
                         -driverOp.getRightX() * mult,
-                        driverOp.getRightY() * mult,
+                        -driverOp.getRightY() * mult,
                         driverOp.getLeftX() * mult,
                         imu.getRotation2d().getDegrees(),   // gyro value passed in here must be in degrees
                         false
@@ -143,7 +144,8 @@ public class DucksTeleOp extends LinearOpMode {
             else mult = 1.0;
 
             liftMotor.set(armOp.getRightY());
-            armMotor.set(armOp.getLeftY());
+            armMotor1.set(armOp.getLeftY());
+            armMotor2.set(armOp.getLeftY());
 
             if (armOp.isDown(GamepadKeys.Button.B)) clawServo.rotateByAngle(0.4);
             if (armOp.isDown(GamepadKeys.Button.X)) clawServo.rotateByAngle(-0.3);
